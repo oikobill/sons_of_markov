@@ -39,8 +39,6 @@ class Parser:
 
 
 
-
-
 parser = Parser()
 parser.read_file("../data/darwin/2355-0.txt")
 parser.process()
