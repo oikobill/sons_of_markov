@@ -1,64 +1,61 @@
 import numpy as np
-import nltk
-import re
+import string, nltk, re, glob
 
 
 class Book:
-	def __init__(self, _author, _title, _text):
-		self.author = _author
-		self.title = _title
-		self.text = _text
 
-	def get_author(self):
-		return self.author
+	def set_author(self, _text):
+		try:
+			_author = re.search('Author:  *.*', _text).group(0) #find author line
+			self.author = _author.strip()[7:].strip()
+		except:
+			print('Could not find author \n')
+			self.author = "None"
 
-	def get_title(self):
-		return self.title
+	def set_title(self, _text):
+		try:
+			_title = re.search('Title:  *.*', _text).group(0) #find title line
+			self.title = _title.strip()[7:].strip()
+		except:
+			print('Could not find title \n')
+			self.title = "None"
 
-	def get_text(self):
-		return self.text
+	def set_text(self, _text):
+		i = _text.rfind('***') # find last instance of  ***
+		_text = _text[i:] # erase everything before that
+		allowed = string.ascii_letters + " "
+		new_txt = ''.join(ch for ch in _text if ch in allowed)
+		self.text = new_txt.lower()
 
-class Parser():
+	def create_bigrams(self):
+		self.bigram = list(nltk.bigrams(self.text.split()))
+
+	def print_bigrams(self):
+		print(*map(' '.join, self.bigram), sep=', ')
+
+	def __init__(self, _text):
+
+		self.set_author(_text)
+		self.set_title(_text)
+		self.set_text(_text)
+		self.create_bigrams()
+
+class Library(Book):
+
+	def create_Book(self, filename):
+		f = open(filename,"r")
+		text = f.read()
+		new_book = Book(text)
+		self.works[new_book.author + "/" + new_book.title] = new_book
 
 	def __init__(self):
 		self.works = {}
-
-	def read_file(self, filename):
-		f = open(filename,"r")
-		text = f.read()
-		author = self._find_author(text)
-		title = self._find_title(text)
-
-		self.works[author + "/" + title] = Book(author, title, text)
-
-	#### Helper Functions 
-	def _find_author(self, text):
-		result = re.search('Author:  *.*', text).group(0)
-		return result.strip()[7:].strip()
-
-	def _find_title(self, text):
-		result = re.search('Title:  *.*', text).group(0)
-		return result.strip()[7:].strip()
-
-	######
-
-	def get_works(self):
-		return self.works
-
-	def remove_punctuation(self, text):
-		exclude = set(string.punctuation)
-		new_txt = ''.join(ch for ch in text if ch not in exclude)
-		
-	def to_lowercase(self, text):
-		return text.lower()
-
-	def process(self):
-		txt = self.to_lowercase(self.text)
-		txt = self.remove_punctuation(txt)
+		# self.create_Book("../data/test.txt")
+		filename = glob.glob("../data/*") # import all files
+		for file in filename:
+			self.create_Book(file)
 
 
-parser = Parser()
-parser.read_file("../data/darwin/2355-0.txt")
-works = parser.get_works()
-print(works['Charles Darwin/The Formation of Vegetable Mould'].get_title())
+library = Library()
+library.works['Nicolas Raga/Test'].print_bigrams()
 
