@@ -58,4 +58,6 @@ class Library(Book):
 
 library = Library()
 library.works['Nicolas Raga/Test'].print_bigrams()
+print(library.works['Nicolas Raga/Test'].text)
+
 
