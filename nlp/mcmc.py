@@ -15,7 +15,7 @@ class MCMC:
         self.bigrams = list(nltk.bigrams(text)) 
         
     def propose_state(self):
-            return np.random.choice(self.vocab)
+        return np.random.choice(self.vocab)
     
     def acceptance_probability(self, current_state, proposed_state):
         numer = len(list(filter(lambda x: x[0]==current_state and x[1]==proposed_state, self.bigrams)))
@@ -42,7 +42,6 @@ class MCMC:
         total_count = sum(freq_dict.values())
         for i in freq_dict.keys():
             freq_dict[i] = freq_dict[i]/total_count
-        
                 
         return freq_dict 
 
